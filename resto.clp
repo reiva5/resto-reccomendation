@@ -179,3 +179,25 @@
     (modify ?r (score (+ ?rscore 1)))
     (assert (eval-clothes ?rname))
 )
+
+(defrule find-solution-budget
+    (user (minBudget ?min) (maxBudget ?max))
+    (restaurant (name ?rname) (rangeBudget ?rmin ?rmax))
+    (test (and (<= ?max ?rmax) (>= ?min ?rmin)))
+    ?r <- (result (name ?rname) (score ?rscore))
+    (not (eval-budget ?rname))
+    =>
+    (printout t ?rname " got budget point " crlf)
+    (modify ?r (score (+ ?rscore 1)))
+    (assert (eval-budget ?rname))
+)
+
+(defrule rearrange-rank
+    ?rx <- (result (score ?scorex) (rank ?rankx))
+    ?ry <- (result (score ?scorey) (rank ?ranky))
+    (test (and (< ?rankx ?ranky) (< ?scorex ?scorey)))
+    (not (eq ?rx ?ry))
+    =>
+    (modify ?rx (rank ?ranky))
+    (modify ?ry (rank ?rankx))
+)
