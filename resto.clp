@@ -143,6 +143,7 @@
 
     (assert (user (name ?uname) (smoke ?usmoke) (minBudget ?uminBudget) (maxBudget ?umaxBudget) (clothes ?uclothes) (wantWifi ?uwantWifi) (latitude ?ulatitude) (longitude ?ulongitude)))
     (printout t crlf crlf "Hai " ?uname ", here's our recommendation:" crlf)
+    (assert (print-sorted))
 )
 
 (defrule find-solution-smoke
@@ -152,7 +153,6 @@
     (not (and (eq ?iAmSmoker yes) (eq ?restoForSmoker TRUE))) ; asumsi non smoker mau ke smoking resto ...
     (not (eval-smoke ?rname))
     =>
-    (printout t ?rname " got smoke point " crlf)
     (modify ?res (score (+ ?rscore 1)))
     (assert (eval-smoke ?rname))
 )
@@ -164,7 +164,6 @@
     (not (and (eq ?uwantWifi yes) (eq ?restoHaveWifi yes)))
     (not (eval-wifi ?rname))
     =>
-    (printout t ?rname " got wifi point " crlf)
     (modify ?res (score (+ ?rscore 1)))
     (assert (eval-wifi ?rname))
 )
@@ -175,7 +174,6 @@
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-clothes ?rname))
     =>
-    (printout t ?rname " got dresscode point " crlf)
     (modify ?r (score (+ ?rscore 1)))
     (assert (eval-clothes ?rname))
 )
@@ -187,7 +185,6 @@
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-budget ?rname))
     =>
-    (printout t ?rname " got budget point " crlf)
     (modify ?r (score (+ ?rscore 1)))
     (assert (eval-budget ?rname))
 )
@@ -200,4 +197,34 @@
     =>
     (modify ?rx (rank ?ranky))
     (modify ?ry (rank ?rankx))
+)
+
+(defrule assert-unprinted "Asserts each item that needs to be printed."
+    (declare (salience -10))
+    (print-sorted)
+    (result (name ?n))
+    =>
+    (assert (unprinted ?n))
+)
+
+(defrule retract-print-sorted "Retract print-sorted after all items enumerated."
+    (declare (salience -100))
+    ?f <- (print-sorted)
+    =>
+    (retract ?f)
+)
+
+(defrule print-greatest "Prints the unprinted item with the greatest score."
+    (not (print-sorted))
+    ?u <- (unprinted ?name)
+    (result (name ?name) (score ?score))
+    (forall (and 
+                (unprinted ?n) 
+                (result (name ?n) (score ?r))
+            )
+        (test (<= ?r ?score))
+    )
+  =>
+  (retract ?u)
+  (printout t "> " ?name " has score " ?score "." crlf)
 )
