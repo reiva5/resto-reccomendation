@@ -165,7 +165,7 @@
   (test (or (eq ?latitude nehi) (eq ?longitude nehi)))
   (test (neq ?latitude ?longitude))
   =>
-  (printout t "Either latitude or longitude is 'nehi'. Ignoring both value...")
+  (printout t "Either latitude or longitude is 'nehi'. Ignoring both value..." crlf)
   (modify ?us (latitude nehi) (longitude nehi))
 )
 
@@ -247,7 +247,7 @@
 (defrule sort-rank-score "Sort the rank based on score."
   ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
   ?resB <- (result (name ?nameB) (score ?scoreB) (rank ?rankB))
-  (test (< ?scoreA ?scoreB))
+  (test (> ?scoreA ?scoreB))
   (test (> ?rankA ?rankB))
   =>
   (modify ?resA (rank ?rankB))
@@ -262,7 +262,7 @@
   (distance ?nameA ?distanceA)
   (distance ?nameB ?distanceB)
   (test (eq ?scoreA ?scoreB))
-  (test (> ?distanceA ?distanceB))
+  (test (< ?distanceA ?distanceB))
   (test (> ?rankA ?rankB))
   =>
   (modify ?resA (rank ?rankB))
