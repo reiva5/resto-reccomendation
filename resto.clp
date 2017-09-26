@@ -3,7 +3,7 @@
 ; =================================================================================
 
 ; Defining template for restaurants
-(deftemplate restaurant 
+(deftemplate restaurant
     (slot name)
     (slot isSmoker)
     (multislot rangeBudget)
@@ -17,9 +17,9 @@
 ; Defining template for user
 (deftemplate user
     (slot name)
-    (slot smoke) 
+    (slot smoke)
     (slot minBudget)
-    (slot maxBudget) 
+    (slot maxBudget)
     (slot clothes)
     (slot wantWifi)
     (slot latitude)
@@ -58,17 +58,17 @@
 ;                                   HELPER FUNCTION
 ; =================================================================================
 
-; Function for validating answer 
+; Function for validating answer
 (deffunction ask-question (?question $?allowed-values)
     (printout t ?question)
     (bind ?answer (read))
-    (if (lexemep ?answer) then 
+    (if (lexemep ?answer) then
         (bind ?answer (lowcase ?answer))
     )
-    (while (not (member ?answer ?allowed-values)) do
+    (while (and (not (eq ?answer nehi)) (not (member ?answer ?allowed-values))) do
         (printout t "Wrong answer! " ?question)
         (bind ?answer (read))
-        (if (lexemep ?answer) then 
+        (if (lexemep ?answer) then
             (bind ?answer (lowcase ?answer))
         )
     )
@@ -76,21 +76,21 @@
 )
 
 ; Function for validating number in range
-(deffunction ask-range-question (?question ?min ?max) 
+(deffunction ask-range-question (?question ?min ?max)
     (printout t ?question)
     (bind ?answer (read))
-    (while (not (numberp ?answer)) do 
+    (while (and (not (eq ?answer nehi)) (not (numberp ?answer))) do
         (printout t "Wrong number! " ?question)
         (bind ?answer (read))
     )
-    (while (or (< ?answer ?min) (> ?answer ?max))
+    (while (and (not (eq ?answer nehi)) (or (< ?answer ?min) (> ?answer ?max))) do
         (printout t "Number must be in range! " ?question)
         (bind ?answer (read))
-        (while (not (numberp ?answer)) do 
+        (while (and (not (eq ?answer nehi)) (not (numberp ?answer))) do
             (printout t "Wrong number! " ?question)
             (bind ?answer (read))
         )
-    ) 
+    )
     ?answer
 )
 
@@ -98,7 +98,7 @@
 (deffunction ask-number-question (?question)
     (printout t ?question)
     (bind ?answer (read))
-    (while (not (numberp ?answer)) do 
+    (while (and (not (eq ?answer nehi)) (not (numberp ?answer))) do
         (printout t "Wrong number! " ?question)
         (bind ?answer (read))
     )
@@ -109,7 +109,7 @@
 ;                                   MAIN PROGRAM
 ; =================================================================================
 
-(defrule prepare-answer 
+(defrule prepare-answer
     ?r <- (restaurant (name ?rname))
     ?f <- (counter (no ?rank))
     (not (result (name ?rname)))
@@ -123,7 +123,7 @@
 ; Asking question to user
 (defrule ask-questions
     =>
-
+    (printout t "[Type 'nehi' (without quotes) if you don't want to state]" crlf)
     (printout t "What is your name? ")
     (bind ?uname (read))
 
@@ -146,8 +146,45 @@
     (assert (print-sorted))
 )
 
+(defrule validate-min-budget "If min budget is 'nehi', set to minimum."
+  ?us <- (user (minBudget ?minBudget))
+  (test (eq ?minBudget nehi))
+  =>
+  (modify ?us (minBudget 0))
+)
+
+(defrule validate-max-budget "If min budget is 'nehi', set to maximum."
+  ?us <- (user (maxBudget ?maxBudget))
+  (test (eq ?maxBudget nehi))
+  =>
+  (modify ?us (maxBudget 9999))
+)
+
+(defrule validate-lat-long "If lat exclusive-or long is 'nehi', set both nehi."
+  ?us <- (user (latitude ?latitude) (longitude ?longitude))
+  (test (or (eq ?latitude nehi) (eq ?longitude nehi)))
+  (test (neq ?latitude ?longitude))
+  =>
+  (printout t "Either latitude or longitude is 'nehi'. Ignoring both value...")
+  (modify ?us (latitude nehi) (longitude nehi))
+)
+
+(defrule calculate-distance-squared "Calculate distance from user to each restaurants."
+  (user (latitude ?userLatitude) (longitude ?userLongitude))
+  (test (and (neq ?userLatitude nehi) (neq ?userLongitude nehi)))
+  (restaurant (name ?restaurantName) (latitude ?restaurantLatitude) (longitude ?restaurantLongitude))
+  (not (distance ?restaurantName ?distance))
+  =>
+  (bind ?latDist (- ?userLatitude ?restaurantLatitude))
+  (bind ?latDistSquare (* ?latDist ?latDist))
+  (bind ?longDist (- ?userLongitude ?restaurantLongitude))
+  (bind ?longDistSquare (* ?longDist ?longDist))
+  (assert (distance ?restaurantName (sqrt (+ ?latDistSquare ?longDistSquare))))
+)
+
 (defrule find-solution-smoke
     (user (smoke ?iAmSmoker))
+    (test (neq ?iAmSmoker nehi))
     ?resto <- (restaurant (name ?rname) (isSmoker ?restoForSmoker))
     ?res <- (result (name ?rname) (score ?rscore))
     (not (and (eq ?iAmSmoker yes) (eq ?restoForSmoker TRUE))) ; asumsi non smoker mau ke smoking resto ...
@@ -159,6 +196,7 @@
 
 (defrule find-solution-wifi
     (user (wantWifi ?uwantWifi))
+    (test (neq ?uwantWifi nehi))
     ?resto <- (restaurant (name ?rname) (hasWifi ?restoHaveWifi))
     ?res <- (result (name ?rname) (score ?rscore))
     (not (and (eq ?uwantWifi yes) (eq ?restoHaveWifi yes)))
@@ -170,6 +208,7 @@
 
 (defrule find-solution-clothes
     (user (clothes ?uclothes))
+    (test (neq ?uclothes nehi))
     ?resto <- (restaurant (name ?rname) (dresscode $? ?uclothes $?))
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-clothes ?rname))
@@ -180,6 +219,7 @@
 
 (defrule find-solution-budget
     (user (minBudget ?min) (maxBudget ?max))
+    (test (and (neq ?min nehi) (neq ?max nehi)))
     (restaurant (name ?rname) (rangeBudget ?rmin ?rmax))
     (test (and (<= ?max ?rmax) (>= ?min ?rmin)))
     ?r <- (result (name ?rname) (score ?rscore))
@@ -187,16 +227,6 @@
     =>
     (modify ?r (score (+ ?rscore 1)))
     (assert (eval-budget ?rname))
-)
-
-(defrule rearrange-rank
-    ?rx <- (result (score ?scorex) (rank ?rankx))
-    ?ry <- (result (score ?scorey) (rank ?ranky))
-    (test (and (< ?rankx ?ranky) (< ?scorex ?scorey)))
-    (not (eq ?rx ?ry))
-    =>
-    (modify ?rx (rank ?ranky))
-    (modify ?ry (rank ?rankx))
 )
 
 (defrule assert-unprinted "Asserts each item that needs to be printed."
@@ -214,17 +244,45 @@
     (retract ?f)
 )
 
-(defrule print-greatest "Prints the unprinted item with the greatest score."
+(defrule sort-rank-score "Sort the rank based on score."
+  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
+  ?resB <- (result (name ?nameB) (score ?scoreB) (rank ?rankB))
+  (test (< ?scoreA ?scoreB))
+  (test (> ?rankA ?rankB))
+  =>
+  (modify ?resA (rank ?rankB))
+  (modify ?resB (rank ?rankA))
+)
+
+(defrule sort-rank-distance "Sort the rank based on distance."
+  (user (latitude ?latitude))
+  (test (neq ?latitude nehi))
+  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
+  ?resB <- (result (name ?resB) (score ?scoreB) (rank ?rankB))
+  (distance ?nameA ?distanceA)
+  (distance ?nameB ?distanceB)
+  (test (eq ?scoreA ?scoreB))
+  (test (> ?distanceA ?distanceB))
+  (test (> ?rankA ?rankB))
+  =>
+  (modify ?resA (rank ?rankB))
+  (modify ?resB (rank ?rankA))
+)
+
+(defrule print-all "Prints the unprinted item with the greatest smallest rank."
     (not (print-sorted))
     ?u <- (unprinted ?name)
-    (result (name ?name) (score ?score))
-    (forall (and 
-                (unprinted ?n) 
-                (result (name ?n) (score ?r))
+    (result (name ?name) (score ?score) (rank ?rank))
+    (forall (and
+                (and
+                  (unprinted ?n)
+                  (result (name ?n) (rank ?r))
+                )
+                (test (not (eq ?n ?name)))
             )
-        (test (<= ?r ?score))
+        (test (> ?r ?rank))
     )
   =>
   (retract ?u)
-  (printout t "> " ?name " has score " ?score "." crlf)
+  (printout t "> " ?name " has score " ?score " and rank " ?rank "." crlf)
 )
