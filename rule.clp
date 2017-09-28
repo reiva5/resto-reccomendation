@@ -69,8 +69,9 @@
 
 (defrule find-solution-clothes
     (user (clothes ?uclothes))
-    ?resto <- (restaurant (name ?rname) (dresscode $? ?restoClothes $?))
+    ?resto <- (restaurant (name ?rname) (dresscode $?restoClothes))
     ?r <- (result (name ?rname) (score ?rscore))
+    (test (or (member$ ?uclothes $?restoClothes) (eq ?uclothes nehi)))
     (not (eval-clothes ?rname))
     =>
     (modify ?r (score (+ ?rscore 1)))
