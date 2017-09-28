@@ -58,6 +58,18 @@
 ;                                   HELPER FUNCTION
 ; =================================================================================
 
+; Function for validating name
+(deffunction ask-name (?question)
+  (printout t ?question)
+  (bind ?answer (read))
+  (while (eq ?answer nehi) do
+      (printout t "Name cannot be empty. Please provide your name." crlf)
+      (printout t ?question)
+      (bind ?answer (read))
+  )
+  ?answer
+)
+
 ; Function for validating answer
 (deffunction ask-question (?question $?allowed-values)
     (printout t ?question)
@@ -124,8 +136,7 @@
 (defrule ask-questions
     =>
     (printout t "[Type 'nehi' (without quotes) if you don't want to state]" crlf)
-    (printout t "What is your name? ")
-    (bind ?uname (read))
+    (bind ?uname (ask-name "What is your name? "))
 
     (bind ?usmoke (ask-question "Do you smoke? (yes, no) " yes no))
 
