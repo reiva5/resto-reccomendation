@@ -47,10 +47,9 @@
 
 (defrule find-solution-smoke
     (user (smoke ?iAmSmoker))
-    (test (neq ?iAmSmoker nehi))
     ?resto <- (restaurant (name ?rname) (isSmoker ?restoForSmoker))
     ?res <- (result (name ?rname) (score ?rscore))
-    (not (and (eq ?iAmSmoker yes) (eq ?restoForSmoker TRUE))) ; asumsi non smoker mau ke smoking resto ...
+    (test (or (or (and (eq ?iAmSmoker yes) (eq ?restoForSmoker TRUE)) (and (eq ?iAmSmoker no) (eq ?restoForSmoker FALSE))) (eq ?iAmSmoker nehi)))
     (not (eval-smoke ?rname))
     =>
     (modify ?res (score (+ ?rscore 1)))
@@ -84,7 +83,7 @@
     (user (minBudget ?min) (maxBudget ?max))
     (test (and (neq ?min nehi) (neq ?max nehi)))
     (restaurant (name ?rname) (rangeBudget ?rmin ?rmax))
-    (test (and (<= ?max ?rmax) (>= ?min ?rmin)))
+    (test (and (>= ?max ?rmax) (<= ?min ?rmin)))
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-budget ?rname))
     =>
