@@ -1,0 +1,6 @@
+(load "template.clp")
+(load "function.clp")
+(load "rule.clp")
+(load "resto.clp")
+(reset)
+(run)
