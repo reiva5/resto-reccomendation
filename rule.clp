@@ -58,10 +58,9 @@
 
 (defrule find-solution-wifi
     (user (wantWifi ?uwantWifi))
-    (test (neq ?uwantWifi nehi))
     ?resto <- (restaurant (name ?rname) (hasWifi ?restoHaveWifi))
     ?res <- (result (name ?rname) (score ?rscore))
-    (not (and (eq ?uwantWifi yes) (eq ?restoHaveWifi yes)))
+    (test (or (eq ?uwantWifi ?restoHaveWifi) (eq ?uwantWifi nehi)))
     (not (eval-wifi ?rname))
     =>
     (modify ?res (score (+ ?rscore 1)))
@@ -70,8 +69,7 @@
 
 (defrule find-solution-clothes
     (user (clothes ?uclothes))
-    (test (neq ?uclothes nehi))
-    ?resto <- (restaurant (name ?rname) (dresscode $? ?uclothes $?))
+    ?resto <- (restaurant (name ?rname) (dresscode $? ?restoClothes $?))
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-clothes ?rname))
     =>
@@ -116,20 +114,20 @@
   (modify ?resB (rank ?rankA))
 )
 
-(defrule sort-rank-distance "Sort the rank based on distance."
-  (user (latitude ?latitude))
-  (test (neq ?latitude nehi))
-  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
-  ?resB <- (result (name ?resB) (score ?scoreB) (rank ?rankB))
-  (distance ?nameA ?distanceA)
-  (distance ?nameB ?distanceB)
-  (test (eq ?scoreA ?scoreB))
-  (test (< ?distanceA ?distanceB))
-  (test (> ?rankA ?rankB))
-  =>
-  (modify ?resA (rank ?rankB))
-  (modify ?resB (rank ?rankA))
-)
+;(defrule sort-rank-distance "Sort the rank based on distance."
+;  (user (latitude ?latitude))
+;  (test (neq ?latitude nehi))
+;  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
+;  ?resB <- (result (name ?resB) (score ?scoreB) (rank ?rankB))
+;  (distance ?nameA ?distanceA)
+;  (distance ?nameB ?distanceB)
+;  (test (eq ?scoreA ?scoreB))
+;  (test (< ?distanceA ?distanceB))
+;  (test (> ?rankA ?rankB))
+;  =>
+;  (modify ?resA (rank ?rankB))
+;  (modify ?resB (rank ?rankA))
+;)
 
 (defrule print-all "Prints the unprinted item with the greatest smallest rank."
     (not (print-sorted))
