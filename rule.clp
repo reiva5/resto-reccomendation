@@ -45,13 +45,13 @@
   (assert (distance ?restaurantName (sqrt (+ ?latDistSquare ?longDistSquare))))
 )
 
-(defrule find-solution-distance
-  ?dist <- (distance ?restaurantName ?distance)
-  (not (eval-distance ?restaurantName ?converted-distance-to-score))
-  =>
-  (bind ?converted-distance-to-score (convert-distance-to-score ?distance))
-  (assert (eval-distance ?restaurantName ?converted-distance-to-score))
-)
+;(defrule find-solution-distance
+;  ?dist <- (distance ?restaurantName ?distance)
+;  (not (eval-distance ?restaurantName ?converted-distance-to-score))
+;  =>
+;  (bind ?converted-distance-to-score (convert-distance-to-score ?distance))
+;  (assert (eval-distance ?restaurantName ?converted-distance-to-score))
+;)
 
 (defrule find-solution-smoke
     (user (smoke ?iAmSmoker))
@@ -123,77 +123,78 @@
   (modify ?resB (rank ?rankA))
 )
 
-;(defrule sort-rank-distance "Sort the rank based on distance."
-;  (user (latitude ?latitude))
-;  (test (neq ?latitude nehi))
-;  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
-;  ?resB <- (result (name ?resB) (score ?scoreB) (rank ?rankB))
-;  (distance ?nameA ?distanceA)
-;  (distance ?nameB ?distanceB)
-;  (test (eq ?scoreA ?scoreB))
-;  (test (< ?distanceA ?distanceB))
-;  (test (> ?rankA ?rankB))
-;  =>
-;  (modify ?resA (rank ?rankB))
-;  (modify ?resB (rank ?rankA))
+(defrule sort-rank-distance "Sort the rank based on distance."
+  (user (latitude ?latitude))
+  (test (neq ?latitude nehi))
+  ?resA <- (result (name ?nameA) (score ?scoreA) (rank ?rankA))
+  ?resB <- (result (name ?nameB) (score ?scoreB) (rank ?rankB))
+  (distance ?nameA ?distanceA)
+  (distance ?nameB ?distanceB)
+  (test (eq ?scoreA ?scoreB))
+  (test (< ?distanceA ?distanceB))
+  (test (> ?rankA ?rankB))
+  =>
+  (modify ?resA (rank ?rankB))
+  (modify ?resB (rank ?rankA))
+)
+
+;(defrule give-recommendation-level-veryrecommendable
+;    (result (name ?name) (score ?score))
+;    (eval-wifi ?name)
+;    (eval-smoke ?name)
+;    (eval-clothes ?name)
+;    (eval-budget ?name)
+;    (test (= 4000 ?score))
+;    (not (recommendationlevel ?name ?recommendationlevel))
+;    =>
+;    (assert (recommendationlevel ?name "Very Recommendable"))
 ;)
 
-(defrule give-recommendation-level-veryrecommendable
-    (result (name ?name) (score ?score))
-    (test (= 4 ?score))
-    (eval-wifi ?name)
-    (eval-smoke ?name)
-    (eval-clothes ?name)
-    (eval-budget ?name)
-    (not (recommendationlevel ?name ?recommendationlevel))
-    =>
-    (assert (recommendationlevel ?name "Very Recommendable"))
-)
+;(defrule give-recommendation-level-recommendable
+;    (result (name ?name) (score ?score))
+;    (eval-wifi ?name)
+;    (eval-smoke ?name)
+;    (eval-clothes ?name)
+;    (eval-budget ?name)
+;    (test (or (= 3000 ?score) (= 2000 ?score)))
+;    (not (recommendationlevel ?name ?recommendationlevel))
+;    =>
+;    (printout t "score: " ?score crlf)
+;    (assert (recommendationlevel ?name "Recommendable"))
+;)
 
-(defrule give-recommendation-level-recommendable
-    (result (name ?name) (score ?score))
-    (test (or (= 3 ?score) (= 2 ?score)))
-    (eval-wifi ?name)
-    (eval-smoke ?name)
-    (eval-clothes ?name)
-    (eval-budget ?name)
-    (not (recommendationlevel ?name ?recommendationlevel))
-    =>
-    (assert (recommendationlevel ?name "Recommendable"))
-)
+;(defrule give-recommendation-level-notrecommendable
+;    (result (name ?name) (score ?score))
+;    (eval-wifi ?name)
+;    (eval-smoke ?name)
+;    (eval-clothes ?name)
+;    (eval-budget ?name)
+;    (test (or (= 1000 ?score) (= 0 ?score)))
+;    (not (recommendationlevel ?name ?recommendationlevel))
+;    =>
+;    (assert (recommendationlevel ?name "Not Recommendable"))
+;)
 
-(defrule give-recommendation-level-notrecommendable
-    (result (name ?name) (score ?score))
-    (test (or (= 1 ?score) (= 0 ?score)))
-    (eval-wifi ?name)
-    (eval-smoke ?name)
-    (eval-clothes ?name)
-    (eval-budget ?name)
-    (not (recommendationlevel ?name ?recommendationlevel))
-    =>
-    (assert (recommendationlevel ?name "Not Recommendable"))
-)
-
-(defrule add-score-with-distance-score
-    ?result <- (result (name ?name) (score ?score))
-    (eval-distance ?name ?converted-distance-to-score)
-    (eval-wifi ?name)
-    (eval-smoke ?name)
-    (eval-clothes ?name)
-    (eval-budget ?name)
-    (recommendationlevel ?name ?recommendation)
-    (not (eval-add-score-with-distance-score ?name))
-    =>
-    (modify ?result (score (+ ?score ?converted-distance-to-score)))
-    (assert (eval-add-score-with-distance-score ?name))
-)
+;(defrule add-score-with-distance-score
+;    ?result <- (result (name ?name) (score ?score))
+;    (eval-distance ?name ?converted-distance-to-score)
+;    (eval-wifi ?name)
+;    (eval-smoke ?name)
+;    (eval-clothes ?name)
+;    (eval-budget ?name)
+;    (recommendationlevel ?name ?recommendation)
+;    (not (eval-add-score-with-distance-score ?name))
+;    =>
+;    (modify ?result (score (+ ?score ?converted-distance-to-score)))
+;    (assert (eval-add-score-with-distance-score ?name))
+;)
 
 (defrule print-all "Prints the unprinted item with the greatest smallest rank."
     (not (print-sorted))
     ?u <- (unprinted ?name)
     (result (name ?name) (score ?score) (rank ?rank))
     (distance ?name ?distance)
-    (recommendationlevel ?name ?recommendationlevel)
+;    (recommendationlevel ?name ?recommendationlevel)
     (forall (and
                 (and
                   (unprinted ?n)
@@ -205,25 +206,7 @@
     )
   =>
   (retract ?u)
-  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
+;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
 ;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
-)
-
-(defrule print-all-without-distance "Prints the unprinted item with the greatest smallest rank."
-    (not (print-sorted))
-    ?u <- (unprinted ?name)
-    (result (name ?name) (score ?score) (rank ?rank))
-    (recommendationlevel ?name ?recommendationlevel)
-    (forall (and
-                (and
-                  (unprinted ?n)
-                  (result (name ?n) (rank ?r))
-                )
-                (test (not (eq ?n ?name)))
-            )
-        (test (> ?r ?rank))
-    )
-  =>
-  (retract ?u)
-  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
+   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance "." crlf)
 )
