@@ -45,14 +45,6 @@
   (assert (distance ?restaurantName (sqrt (+ ?latDistSquare ?longDistSquare))))
 )
 
-;(defrule find-solution-distance
-;  ?dist <- (distance ?restaurantName ?distance)
-;  (not (eval-distance ?restaurantName ?converted-distance-to-score))
-;  =>
-;  (bind ?converted-distance-to-score (convert-distance-to-score ?distance))
-;  (assert (eval-distance ?restaurantName ?converted-distance-to-score))
-;)
-
 (defrule find-solution-smoke
     (user (smoke ?iAmSmoker))
     ?resto <- (restaurant (name ?rname) (isSmoker ?restoForSmoker))
@@ -173,20 +165,6 @@
 ;    (not (recommendationlevel ?name ?recommendationlevel))
 ;    =>
 ;    (assert (recommendationlevel ?name "Not Recommendable"))
-;)
-
-;(defrule add-score-with-distance-score
-;    ?result <- (result (name ?name) (score ?score))
-;    (eval-distance ?name ?converted-distance-to-score)
-;    (eval-wifi ?name)
-;    (eval-smoke ?name)
-;    (eval-clothes ?name)
-;    (eval-budget ?name)
-;    (recommendationlevel ?name ?recommendation)
-;    (not (eval-add-score-with-distance-score ?name))
-;    =>
-;    (modify ?result (score (+ ?score ?converted-distance-to-score)))
-;    (assert (eval-add-score-with-distance-score ?name))
 ;)
 
 (defrule print-all "Prints the unprinted item with the greatest smallest rank."
