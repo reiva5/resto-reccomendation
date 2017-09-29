@@ -208,3 +208,22 @@
   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
 ;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
 )
+
+(defrule print-all-without-distance "Prints the unprinted item with the greatest smallest rank."
+    (not (print-sorted))
+    ?u <- (unprinted ?name)
+    (result (name ?name) (score ?score) (rank ?rank))
+    (recommendationlevel ?name ?recommendationlevel)
+    (forall (and
+                (and
+                  (unprinted ?n)
+                  (result (name ?n) (rank ?r))
+                )
+                (test (not (eq ?n ?name)))
+            )
+        (test (> ?r ?rank))
+    )
+  =>
+  (retract ?u)
+  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
+)
