@@ -82,7 +82,7 @@
     (user (minBudget ?min) (maxBudget ?max))
     (test (and (neq ?min nehi) (neq ?max nehi)))
     (restaurant (name ?rname) (rangeBudget ?rmin ?rmax))
-    (test (and (>= ?max ?rmax) (<= ?min ?rmin)))
+    (test (and (>= ?max ?rmin) (<= ?min ?rmax)))
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-budget ?rname))
     =>
