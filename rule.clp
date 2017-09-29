@@ -60,7 +60,7 @@
     (test (or (or (and (eq ?iAmSmoker yes) (eq ?restoForSmoker TRUE)) (and (eq ?iAmSmoker no) (eq ?restoForSmoker FALSE))) (eq ?iAmSmoker nehi)))
     (not (eval-smoke ?rname))
     =>
-    (modify ?res (score (+ ?rscore 1)))
+    (modify ?res (score (+ ?rscore 1000)))
     (assert (eval-smoke ?rname))
 )
 
@@ -71,7 +71,7 @@
     (test (or (eq ?uwantWifi ?restoHaveWifi) (eq ?uwantWifi nehi)))
     (not (eval-wifi ?rname))
     =>
-    (modify ?res (score (+ ?rscore 1)))
+    (modify ?res (score (+ ?rscore 1000)))
     (assert (eval-wifi ?rname))
 )
 
@@ -82,7 +82,7 @@
     (test (or (member$ ?uclothes $?restoClothes) (eq ?uclothes nehi)))
     (not (eval-clothes ?rname))
     =>
-    (modify ?r (score (+ ?rscore 1)))
+    (modify ?r (score (+ ?rscore 1000)))
     (assert (eval-clothes ?rname))
 )
 
@@ -94,7 +94,7 @@
     ?r <- (result (name ?rname) (score ?rscore))
     (not (eval-budget ?rname))
     =>
-    (modify ?r (score (+ ?rscore 1)))
+    (modify ?r (score (+ ?rscore 1000)))
     (assert (eval-budget ?rname))
 )
 
