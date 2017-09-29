@@ -45,6 +45,14 @@
   (assert (distance ?restaurantName (sqrt (+ ?latDistSquare ?longDistSquare))))
 )
 
+(defrule find-solution-distance
+  ?dist <- (distance ?restaurantName ?distance)
+  (not (eval-distance ?restaurantName ?converted-distance-to-score))
+  =>
+  (bind ?converted-distance-to-score (convert-distance-to-score ?distance))
+  (assert (eval-distance ?restaurantName ?converted-distance-to-score))
+)
+
 (defrule find-solution-smoke
     (user (smoke ?iAmSmoker))
     ?resto <- (restaurant (name ?rname) (isSmoker ?restoForSmoker))
@@ -130,10 +138,62 @@
 ;  (modify ?resB (rank ?rankA))
 ;)
 
+(defrule give-recommendation-level-veryrecommendable
+    (result (name ?name) (score ?score))
+    (test (= 4 ?score))
+    (eval-wifi ?name)
+    (eval-smoke ?name)
+    (eval-clothes ?name)
+    (eval-budget ?name)
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Very Recommendable"))
+)
+
+(defrule give-recommendation-level-recommendable
+    (result (name ?name) (score ?score))
+    (test (or (= 3 ?score) (= 2 ?score)))
+    (eval-wifi ?name)
+    (eval-smoke ?name)
+    (eval-clothes ?name)
+    (eval-budget ?name)
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Recommendable"))
+)
+
+(defrule give-recommendation-level-notrecommendable
+    (result (name ?name) (score ?score))
+    (test (or (= 1 ?score) (= 0 ?score)))
+    (eval-wifi ?name)
+    (eval-smoke ?name)
+    (eval-clothes ?name)
+    (eval-budget ?name)
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Not Recommendable"))
+)
+
+(defrule add-score-with-distance-score
+    ?result <- (result (name ?name) (score ?score))
+    (eval-distance ?name ?converted-distance-to-score)
+    (eval-wifi ?name)
+    (eval-smoke ?name)
+    (eval-clothes ?name)
+    (eval-budget ?name)
+    (recommendationlevel ?name ?recommendation)
+    (not (eval-add-score-with-distance-score ?name))
+    =>
+    (modify ?result (score (+ ?score ?converted-distance-to-score)))
+    (assert (eval-add-score-with-distance-score ?name))
+)
+
 (defrule print-all "Prints the unprinted item with the greatest smallest rank."
     (not (print-sorted))
     ?u <- (unprinted ?name)
     (result (name ?name) (score ?score) (rank ?rank))
+    (distance ?name ?distance)
+    (recommendationlevel ?name ?recommendationlevel)
     (forall (and
                 (and
                   (unprinted ?n)
@@ -145,5 +205,6 @@
     )
   =>
   (retract ?u)
-  (printout t "> " ?name " has score " ?score " and rank " ?rank "." crlf)
+  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
+;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
 )

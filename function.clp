@@ -27,6 +27,12 @@
     ?answer
 )
 
+; Function for converting distance into score
+(deffunction convert-distance-to-score (?distance)
+    (bind ?score (+(* (- ?distance 202) -1) 100))
+    ?score
+)
+
 ; Function for validating number in range
 (deffunction ask-range-question (?question ?min ?max)
     (printout t ?question)
