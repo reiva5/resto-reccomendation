@@ -52,13 +52,25 @@
     ?answer
 )
 
-; Function for validating numeric answer
-(deffunction ask-number-question (?question)
+; Function for validating latitude answer
+(deffunction ask-latitude (?question)
     (printout t ?question)
     (bind ?answer (read))
-    (while (and (not (eq ?answer nehi)) (not (numberp ?answer))) do
+    (while (or (and (not (eq ?answer nehi)) (not (numberp ?answer))) (and (numberp ?answer) (or (< ?answer -90) (> ?answer 90)))) do
         (printout t "Wrong number! " ?question)
         (bind ?answer (read))
     )
+    ?answer
+)
+
+; Function for validating latitude answer
+(deffunction ask-longitude (?question)
+    (printout t ?question)
+    (bind ?answer (read))
+    (while (or (not (numberp ?answer)) (or (< ?answer -180) (> ?answer 180))) do
+        (printout t "Wrong number! " ?question)
+        (bind ?answer (read))
+    )
+    
     ?answer
 )

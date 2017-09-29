@@ -13,9 +13,15 @@
 
     (bind ?uwantWifi (ask-question  "Do you want a restaurant with Wi-Fi? (yes, no) " yes no))
 
-    (bind ?ulatitude (ask-number-question "What are your lat. coordinate? "))
+    (bind ?ulatitude (ask-latitude "What are your lat. coordinate? "))
 
-    (bind ?ulongitude (ask-number-question "What are your long. coordinate? "))
+    (if (not(eq ?ulatitude nehi)) then
+
+        (bind ?ulongitude (ask-longitude "What are your long. coordinate? "))
+    else
+        (bind ?ulongitude nehi)
+        (printout t "What are your long. coordinate? " ?ulongitude)
+    )
 
     (assert (user (name ?uname) (smoke ?usmoke) (minBudget ?uminBudget) (maxBudget ?umaxBudget) (clothes ?uclothes) (wantWifi ?uwantWifi) (latitude ?ulatitude) (longitude ?ulongitude)))
     (printout t crlf crlf "Hai " ?uname ", here's our recommendation:" crlf)
