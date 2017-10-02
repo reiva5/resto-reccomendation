@@ -173,7 +173,7 @@
     )
   =>
   (retract ?u)
-  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
+  (printout t "> " (+ ?wah 1) ". " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
   (retract ?cnt_now)
   (assert (count (+ ?wah 1)))
 ;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
