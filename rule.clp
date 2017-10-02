@@ -130,49 +130,36 @@
   (modify ?resB (rank ?rankA))
 )
 
-;(defrule give-recommendation-level-veryrecommendable
-;    (result (name ?name) (score ?score))
-;    (eval-wifi ?name)
-;    (eval-smoke ?name)
-;    (eval-clothes ?name)
-;    (eval-budget ?name)
-;    (test (= 4000 ?score))
-;    (not (recommendationlevel ?name ?recommendationlevel))
-;    =>
-;    (assert (recommendationlevel ?name "Very Recommendable"))
-;)
+(defrule give-recommendation-level-veryrecommendable
+    (result (name ?name) (score ?score))
+    (test (= 4000 ?score))
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Very Recommendable"))
+)
 
-;(defrule give-recommendation-level-recommendable
-;    (result (name ?name) (score ?score))
-;    (eval-wifi ?name)
-;    (eval-smoke ?name)
-;    (eval-clothes ?name)
-;    (eval-budget ?name)
-;    (test (or (= 3000 ?score) (= 2000 ?score)))
-;    (not (recommendationlevel ?name ?recommendationlevel))
-;    =>
-;    (printout t "score: " ?score crlf)
-;    (assert (recommendationlevel ?name "Recommendable"))
-;)
+(defrule give-recommendation-level-recommendable
+    (result (name ?name) (score ?score))
+    (test (or (= 3000 ?score) (= 2000 ?score)))
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Recommendable"))
+)
 
-;(defrule give-recommendation-level-notrecommendable
-;    (result (name ?name) (score ?score))
-;    (eval-wifi ?name)
-;    (eval-smoke ?name)
-;    (eval-clothes ?name)
-;    (eval-budget ?name)
-;    (test (or (= 1000 ?score) (= 0 ?score)))
-;    (not (recommendationlevel ?name ?recommendationlevel))
-;    =>
-;    (assert (recommendationlevel ?name "Not Recommendable"))
-;)
+(defrule give-recommendation-level-notrecommendable
+    (result (name ?name) (score ?score))
+    (test (or (= 1000 ?score) (= 0 ?score)))
+    (not (recommendationlevel ?name ?recommendationlevel))
+    =>
+    (assert (recommendationlevel ?name "Not Recommendable"))
+)
 
 (defrule print-all "Prints the unprinted item with the greatest smallest rank."
     (not (print-sorted))
     ?u <- (unprinted ?name)
     (result (name ?name) (score ?score) (rank ?rank))
     (distance ?name ?distance)
-;    (recommendationlevel ?name ?recommendationlevel)
+    (recommendationlevel ?name ?recommendationlevel)
     (forall (and
                 (and
                   (unprinted ?n)
@@ -184,7 +171,7 @@
     )
   =>
   (retract ?u)
-;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
+  (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
 ;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
-   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance "." crlf)
+;   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance "." crlf)
 )
