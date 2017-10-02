@@ -148,7 +148,7 @@
 
 (defrule give-recommendation-level-notrecommendable
     (result (name ?name) (score ?score))
-    (test (or (= 1000 ?score) (= 0 ?score)))
+    (test (= 1000 ?score))
     (not (recommendationlevel ?name ?recommendationlevel))
     =>
     (assert (recommendationlevel ?name "Not Recommendable"))
