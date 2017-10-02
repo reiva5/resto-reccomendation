@@ -160,6 +160,8 @@
     (result (name ?name) (score ?score) (rank ?rank))
     (distance ?name ?distance)
     (recommendationlevel ?name ?recommendationlevel)
+    ?cnt_now <- (count ?wah)
+    (test (< ?wah 3))
     (forall (and
                 (and
                   (unprinted ?n)
@@ -172,6 +174,13 @@
   =>
   (retract ?u)
   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance " with recommendationlevel " ?recommendationlevel "." crlf)
+  (retract ?cnt_now)
+  (assert (count (+ ?wah 1)))
 ;  (printout t "> " ?name " has score " ?score " and rank " ?rank " with recommendation level: " ?recommendationlevel "." crlf)
 ;   (printout t "> " ?name " has score " ?score " and rank " ?rank " with distance " ?distance "." crlf)
+)
+
+(defrule cnt
+    =>
+    (assert (count 0))
 )
